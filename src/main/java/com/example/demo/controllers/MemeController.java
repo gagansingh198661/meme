@@ -9,6 +9,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +26,9 @@ public class MemeController {
 	@Autowired
 	private CreateMemeService memeService;
 	
+	@Autowired
+	private ResourceLoader loader;
+	
 	@ResponseBody
 	@RequestMapping(value="/makememe")
 	public void makeMeme(@RequestBody MemeDTO dto) {
@@ -38,7 +43,8 @@ public class MemeController {
 
 	      resonse.setContentType("image/jpg");
 	      resonse.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
-	      BufferedInputStream inStrem = new BufferedInputStream(new FileInputStream(file));
+	      Resource resource = loader.getResource("classpath:static/tmp/"+"test.jpg");
+	      BufferedInputStream inStrem = new BufferedInputStream(new FileInputStream(resource.getFile()));
 	      BufferedOutputStream outStream = new BufferedOutputStream(resonse.getOutputStream());
 	      
 	      byte[] buffer = new byte[1024];

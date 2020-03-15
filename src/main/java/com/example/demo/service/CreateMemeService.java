@@ -33,8 +33,8 @@ public class CreateMemeService {
 		String fileLocation = new File("static\\tmp\\").getAbsolutePath() ;
 		
 		try {
-			
-			fileLocation=fileLocation+"\\"+fileName;
+			Resource resource = loader.getResource("classpath:static/tmp/"+fileName);
+			fileLocation=resource.getURL().getFile();
 			ImageIO.write(scaleimg, "jpg", new File(fileLocation));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
