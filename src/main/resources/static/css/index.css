@@ -1,0 +1,11 @@
+@charset "ISO-8859-1";
+.thumbnail{
+	width:150px;
+	height:150px;
+}
+
+.top-left {
+  position: absolute;
+  top: 28px;
+  left: 317px;
+}

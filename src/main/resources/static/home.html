@@ -1,0 +1,153 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Dialog - Modal form</title>
+  <link rel="stylesheet" href="jqueryui/jquery-ui.css">
+  <link rel="stylesheet" href="css/index.css">
+  
+  <style>
+    label, input { display:block; }
+    input.text { margin-bottom:12px; width:95%; padding: .4em; }
+    fieldset { padding:0; border:0; margin-top:25px; }
+    h1 { font-size: 1.2em; margin: .6em 0; }
+    div#users-contain { width: 350px; margin: 20px 0; }
+    div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+    div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+    .ui-dialog .ui-state-error { padding: .3em; }
+    .validateTips { border: 1px solid transparent; padding: 0.3em; }
+  </style>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="jqueryui/jquery-ui.js"></script>
+  
+</head>
+<body>
+ <a id="download" hidden></a>
+<div id="dialog-form" title="Meme Creator">
+  <table>
+  	<tr>
+  		<td>
+  			<div class="top-left" style="visibility:hidden;">Top Left</div>
+  			<img id="modal-img" ></img>
+  		</td>
+  		<td>
+	  		<form>
+			    <fieldset>
+			      <label for="name">Meme Text</label>
+	
+			    <input type="text" name="name" id="meme" value="Meme Text" class="text ui-widget-content ui-corner-all">
+				
+			    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+			    </fieldset>
+	  		</form>
+  		</td>
+  	</tr>
+  </table>
+  
+</div>
+ 
+ 
+<div id="users-contain" class="ui-widget">
+  <h1>Select An Image:</h1>
+  <table id="users" class="ui-widget ui-widget-content">
+    
+    <tbody>
+      <tr>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="1"alt="" src="img/dr_evil_austin_powers.jpg"></a></td>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="2" src="img/jackie-chan-why.jpg"></a></td>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="3" src="img/melania-trump.jpg"></a></td>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="4" src="img/serious-albert-einstein.jpg"></a></td>
+      </tr>
+      <tr>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="5" src="img/things-are-getting-pretty-serious.jpg"></a></td>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="6" src="img/tony-stark-eye-roll.jpg"></a></td>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="7" src="img/upvote_obama.jpg"></a></td>
+        <td><a class="clickableA" href="#"><img class="thumbnail" id="8" src="img/worst_apocalypse_ever.jpg"></a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+ 
+ 
+</body>
+<script type="text/javascript">
+$( function() {
+	 var dialog, form;
+		 
+	 dialog = $( "#dialog-form" ).dialog({
+     	  autoOpen: false,
+     	  height: 600,
+	      width: 850,
+	      modal: true,
+	      buttons: {
+	        "Create Meme": addUser,
+	        "Preview": function() {
+	        	var meme = $("#meme").val();
+	        	 $(".top-left").css("visibility", "visible");
+	        	 $(".top-left").text(meme);
+	        }
+	      },
+	      close: function() {
+	        form[ 0 ].reset();
+	      }
+  	 }); 
+	 form = dialog.find( "form" ).on( "submit", function( event ) {
+	      event.preventDefault();
+	      addUser();
+	 }); 
+	 function addUser() {
+		 var meme = $("#meme").val();
+	     var memedto = {"memeText" : meme ,"imageName" : $("#modal-img").attr("src")};
+    	 $.ajax({
+ 	    	  method: "POST",
+ 	    	  url: "/makememe",
+ 	    	  contentType: 'application/json',
+ 	    	  responseType : 'blob',
+ 	    	  dataType: 'text',
+ 	    	  data: JSON.stringify(memedto),
+ 	          success: function downloadURI(uri) 
+ 	          {		
+ 	        	  var aElement = document.getElementById('download');
+ 	        	  aElement.href = "download3";
+ 	        	  aElement.click();
+ 	          },
+	    	  error:function (xhr, ajaxOptions, thrownError) {
+	    	        console.log("in error");
+	    	  } 
+ 	    });
+     } 
+	 
+	 $(".clickableA").click(function(event) {
+	        var idOfImage="#"+event.target.id;
+	        var img = new Image();
+	        var wimg,himg;
+	        img.onload = function() {
+	          wimg=this.width*(1/4);
+	          himg=this.height*(1/4);
+	        }
+	        var pathOfImage=($(idOfImage).attr('src'));
+	        img.src = pathOfImage;
+	        $("#modal-img").attr("src",pathOfImage);
+	        $("#modal-img").attr('height',himg);
+	        $("#modal-img").attr('width',wimg);
+	       
+	    	$("#dialog-form").dialog( "open" );
+	    
+		});
+	
+	
+	
+	
+	
+});
+    		
+    	
+        
+
+	
+  
+</script>
+</html>
