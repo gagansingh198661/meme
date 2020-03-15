@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.dtos.Meme;
 
 @Repository
-public interface DbRepoasitory extends JpaRepository<Meme, String>{
+public interface DbRepository extends JpaRepository<Meme, String>{
 
 }

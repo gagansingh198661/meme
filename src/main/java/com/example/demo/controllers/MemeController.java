@@ -2,9 +2,11 @@ package com.example.demo.controllers;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.dtos.MemeDTO;
 import com.example.demo.service.CreateMemeService;
+import com.example.demo.service.DBStorageService;
 
 @Controller
 public class MemeController {
@@ -26,25 +29,23 @@ public class MemeController {
 	@Autowired
 	private CreateMemeService memeService;
 	
+	
 	@Autowired
-	private ResourceLoader loader;
+	private DBStorageService storageService;
 	
 	@ResponseBody
 	@RequestMapping(value="/makememe")
 	public void makeMeme(@RequestBody MemeDTO dto) {
-		
-		String url=memeService.createMeme(dto);
-		System.out.println(url);
+		System.out.println(memeService.createMeme(dto));
 	}
 	
 	   @GetMapping("/download3")
 	   public void downloadFile3(HttpServletResponse resonse) throws IOException {
-		File file = new File("static\\tmp\\test.jpg");
 
 	      resonse.setContentType("image/jpg");
-	      resonse.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
-	      Resource resource = loader.getResource("classpath:static/tmp/"+"test.jpg");
-	      BufferedInputStream inStrem = new BufferedInputStream(new FileInputStream(resource.getFile()));
+	      resonse.setHeader("Content-Disposition", "attachment;filename=" + "test.jpg");
+	      InputStream targetStream = new ByteArrayInputStream(storageService.getMeme().getData());
+	      BufferedInputStream inStrem = new BufferedInputStream(targetStream);
 	      BufferedOutputStream outStream = new BufferedOutputStream(resonse.getOutputStream());
 	      
 	      byte[] buffer = new byte[1024];
@@ -54,5 +55,6 @@ public class MemeController {
 	      }
 	      outStream.flush();
 	      inStrem.close();
+	      storageService.delete();
 	   }
 }

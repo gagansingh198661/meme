@@ -1,6 +1,7 @@
 package com.example.demo.service;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +18,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
+import com.example.demo.dtos.Meme;
 import com.example.demo.dtos.MemeDTO;
+import com.example.demo.repository.DbRepository;
 
 @Service
 public class CreateMemeService {
@@ -27,10 +30,31 @@ public class CreateMemeService {
 	@Autowired
 	private ResourceLoader loader;
 	
-	public String createMeme(MemeDTO dto) {
+	@Autowired
+	private DbRepository repository;
+	
+	public boolean createMeme(MemeDTO dto) {
+		boolean flag=true;
 		BufferedImage scaleimg = scaleImage(dto.getImageName());
 		scaleimg=addTextToImage(scaleimg, dto.getMemeText());
-		String fileLocation = new File("static\\tmp\\").getAbsolutePath() ;
+		Meme meme= new Meme();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			ImageIO.write( scaleimg, "jpg", baos );
+			baos.flush();
+			byte[] imageInByte = baos.toByteArray();
+			baos.close();
+			meme.setData(imageInByte);
+			repository.save(meme);
+		} catch (IOException e1) {
+			flag=false;
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+		
+		/*String fileLocation = new File("static\\tmp\\").getAbsolutePath() ;
 		
 		try {
 			Resource resource = loader.getResource("classpath:static/tmp/"+fileName);
@@ -39,8 +63,8 @@ public class CreateMemeService {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		return fileLocation;
+		}*/
+		return flag;
 
 	}
 
